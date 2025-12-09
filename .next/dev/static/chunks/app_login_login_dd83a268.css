@@ -1,0 +1,41 @@
+/* [project]/app/login/login.css [app-client] (css) */
+.login-container {
+  background: var(--card-bg);
+  border-radius: 8px;
+  width: 350px;
+  margin: 50px auto;
+  padding: 25px;
+  box-shadow: 0 0 10px #0003;
+}
+
+.login-container h2 {
+  text-align: center;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.login-input {
+  background: var(--bg);
+  width: 100%;
+  color: var(--text);
+  border: 1px solid #444;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  padding: 10px;
+}
+
+.login-button {
+  color: #fff;
+  cursor: pointer;
+  background: #444;
+  border: none;
+  border-radius: 6px;
+  width: 100%;
+  padding: 10px;
+}
+
+.login-button:hover {
+  background: #666;
+}
+
+/*# sourceMappingURL=app_login_login_dd83a268.css.map*/

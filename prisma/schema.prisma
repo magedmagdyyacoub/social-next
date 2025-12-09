@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(cuid())
+  name             String?
+  email            String          @unique
+  password         String
+  role             String          @default("USER")
+  createdAt        DateTime        @default(now())
+  posts            Post[]
+  comments         Comment[]
+  likes            Like[]
+  commentLikes     CommentLike[]
+  sentRequests     FriendRequest[] @relation("SentRequests")
+  receivedRequests FriendRequest[] @relation("ReceivedRequests")
+  friends          Friend[]        @relation("UserFriends")
+  friendedBy       Friend[]        @relation("FriendUsers")
+  reels            Reel[]
+  reelLikes        ReelLike[]
+
+  sentMessages     Message[]  @relation("sentMessages")
+  receivedMessages Message[]  @relation("receivedMessages")
+  chatUsers        ChatUser[]
+
+  // back-relations for reel comments
+  reelComments     ReelComment[]     @relation("ReelCommentAuthor")
+  reelCommentLikes ReelCommentLike[] @relation("ReelCommentLikeUser")
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  image     String?
+  video     String?
+  createdAt DateTime  @default(now())
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id])
+  comments  Comment[]
+  likes     Like[]
+}
+
+model Comment {
+  id       String        @id @default(cuid())
+  content  String
+  emoji    String? // optional emoji
+  postId   String
+  post     Post          @relation(fields: [postId], references: [id])
+  authorId String
+  author   User          @relation(fields: [authorId], references: [id])
+  parentId String? // optional parent comment
+  parent   Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Comment[]     @relation("CommentReplies")
+  likes    CommentLike[]
+
+  createdAt DateTime @default(now())
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId]) // تمنع تكرار اللايك لنفس المستخدم
+}
+
+model CommentLike {
+  id        String   @id @default(cuid())
+  commentId String
+  comment   Comment  @relation(fields: [commentId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([commentId, userId])
+}
+
+model FriendRequest {
+  id        String   @id @default(cuid())
+  fromId    String
+  toId      String
+  status    String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  createdAt DateTime @default(now())
+
+  from User @relation("SentRequests", fields: [fromId], references: [id])
+  to   User @relation("ReceivedRequests", fields: [toId], references: [id])
+}
+
+model Friend {
+  id       String @id @default(cuid())
+  userId   String
+  friendId String
+
+  user   User @relation("UserFriends", fields: [userId], references: [id])
+  friend User @relation("FriendUsers", fields: [friendId], references: [id])
+
+  @@unique([userId, friendId])
+}
+
+model Reel {
+  id        String        @id @default(cuid())
+  video     String
+  caption   String?
+  createdAt DateTime      @default(now())
+  authorId  String
+  author    User          @relation(fields: [authorId], references: [id])
+  likes     ReelLike[]
+  comments  ReelComment[] // all comments on this reel
+}
+
+model ReelLike {
+  id     String @id @default(cuid())
+  reelId String
+  userId String
+
+  reel Reel @relation(fields: [reelId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([reelId, userId])
+}
+
+model Chat {
+  id        String     @id @default(cuid())
+  users     ChatUser[]
+  messages  Message[]
+  createdAt DateTime   @default(now())
+}
+
+model ChatUser {
+  id     String @id @default(cuid())
+  chatId String
+  userId String
+
+  chat Chat @relation(fields: [chatId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([chatId, userId])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  chatId     String
+  senderId   String
+  receiverId String?
+  content    String
+  createdAt  DateTime @default(now())
+
+  chat     Chat  @relation(fields: [chatId], references: [id])
+  sender   User  @relation("sentMessages", fields: [senderId], references: [id])
+  receiver User? @relation("receivedMessages", fields: [receiverId], references: [id])
+}
+
+model ReelComment {
+  id        String            @id @default(cuid())
+  content   String
+  emoji     String?
+  reelId    String
+  reel      Reel              @relation(fields: [reelId], references: [id])
+  authorId  String
+  author    User              @relation("ReelCommentAuthor", fields: [authorId], references: [id])
+  parentId  String?
+  parent    ReelComment?      @relation("ReelCommentReplies", fields: [parentId], references: [id])
+  replies   ReelComment[]     @relation("ReelCommentReplies")
+  likes     ReelCommentLike[]
+  createdAt DateTime          @default(now())
+}
+
+model ReelCommentLike {
+  id            String      @id @default(cuid())
+  reelCommentId String
+  reelComment   ReelComment @relation(fields: [reelCommentId], references: [id])
+  userId        String
+  user          User        @relation("ReelCommentLikeUser", fields: [userId], references: [id])
+  createdAt     DateTime    @default(now())
+
+  @@unique([reelCommentId, userId])
+}
