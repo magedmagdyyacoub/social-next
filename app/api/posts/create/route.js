@@ -1,6 +1,16 @@
-export async function POST(req: Request) {
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { getUserFromCookie } from "@/lib/auth";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+export async function POST(req) {
   try {
-    // لازم نمرر req
     const user = await getUserFromCookie(req);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -26,7 +36,8 @@ export async function POST(req: Request) {
     if (image && image instanceof File) {
       const bytes = await image.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      const uploadResult = await new Promise<any>((resolve, reject) => {
+
+      const uploadResult = await new Promise((resolve, reject) => {
         cloudinary.uploader.upload_stream(
           { folder: "posts", resource_type: "image" },
           (err, result) => {
@@ -35,6 +46,7 @@ export async function POST(req: Request) {
           }
         ).end(buffer);
       });
+
       imageUrl = uploadResult.secure_url;
     }
 
@@ -42,7 +54,8 @@ export async function POST(req: Request) {
     if (video && video instanceof File) {
       const bytes = await video.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      const uploadResult = await new Promise<any>((resolve, reject) => {
+
+      const uploadResult = await new Promise((resolve, reject) => {
         cloudinary.uploader.upload_stream(
           { folder: "posts", resource_type: "video" },
           (err, result) => {
@@ -51,6 +64,7 @@ export async function POST(req: Request) {
           }
         ).end(buffer);
       });
+
       videoUrl = uploadResult.secure_url;
     }
 
