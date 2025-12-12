@@ -1,16 +1,14 @@
-// app/api/reels/mine/route.js
 import prisma from "@/lib/prisma";
 import { getUserFromCookie } from "@/lib/auth";
 
 export async function GET(req) {
   try {
-    const user = await getUserFromCookie();
+    const user = await getUserFromCookie(req); // ✅ required
 
     if (!user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401 }
-      );
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
     }
 
     const reels = await prisma.reel.findMany({
@@ -21,24 +19,22 @@ export async function GET(req) {
         createdAt: "desc",
       },
       include: {
-        likes: true,                // include likes
-        comments: {                 // include comments
+        likes: true,
+        comments: {
           include: {
-            author: true,           // include comment author
-            likes: true             // include likes on comment
+            author: true,
+            likes: true,
           },
+          orderBy: { createdAt: "desc" },
         },
       },
     });
 
-    return new Response(JSON.stringify({ reels }), {
-      status: 200,
-    });
+    return new Response(JSON.stringify({ reels }), { status: 200 });
   } catch (error) {
     console.error("Get my reels error:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+    });
   }
 }

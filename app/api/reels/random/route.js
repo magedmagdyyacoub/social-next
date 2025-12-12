@@ -19,6 +19,9 @@ export async function GET() {
     return NextResponse.json({ reels });
   } catch (err) {
     console.error("Fetch random reels error:", err);
-    return NextResponse.json({ error: "Failed to fetch reels" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch reels" },
+      { status: 500 }
+    );
   }
 }

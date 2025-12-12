@@ -1,29 +1,33 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getUserFromCookie } from "@/lib/auth";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
 
-// GET a reel by ID
-export async function GET(req, context) {
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// ========================= GET REEL =========================
+export async function GET(req, { params }) {
   try {
-    const { id } = context.params;
+    const { id } = params;
 
     const reel = await prisma.reel.findUnique({
       where: { id },
       include: {
-        author: { select: { id: true, name: true, email: true } },
-        likes: { include: { user: true } },
+        author: { select: { id: true, name: true, image: true } },
+        likes: true,
         comments: {
           where: { parentId: null },
           include: {
-            author: { select: { id: true, name: true } },
-            likes: { select: { userId: true } },
+            author: { select: { id: true, name: true, image: true } },
+            likes: true,
             replies: {
               include: {
-                author: { select: { id: true, name: true } },
-                likes: { select: { userId: true } },
-                replies: true, // optional: deeper nested replies
+                author: true,
+                likes: true,
               },
             },
           },
@@ -32,7 +36,10 @@ export async function GET(req, context) {
       },
     });
 
-    if (!reel) return NextResponse.json({ error: "Reel not found" }, { status: 404 });
+    if (!reel) {
+      return NextResponse.json({ error: "Reel not found" }, { status: 404 });
+    }
+
     return NextResponse.json({ reel });
   } catch (err) {
     console.error("Get reel error:", err);
@@ -40,29 +47,44 @@ export async function GET(req, context) {
   }
 }
 
-// PUT (edit) reel
-export async function PUT(req, context) {
+// ========================= UPDATE REEL =========================
+export async function PUT(req, { params }) {
   try {
-    const { id } = context.params;
-    const user = await getUserFromCookie(req);
+    const user = await getUserFromCookie(); // FIXED
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { id } = params;
 
     const reel = await prisma.reel.findUnique({ where: { id } });
     if (!reel) return NextResponse.json({ error: "Reel not found" }, { status: 404 });
-    if (reel.authorId !== user.id) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (reel.authorId !== user.id)
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const formData = await req.formData();
-    const caption = formData.get("caption") || reel.caption;
-    const videoFile = formData.get("video");
+    const form = await req.formData();
+    const caption = form.get("caption") || reel.caption;
+    const video = form.get("video");
 
     let videoUrl = reel.video;
 
-    if (videoFile && videoFile.size > 0) {
-      const buffer = Buffer.from(await videoFile.arrayBuffer());
-      const filename = `${Date.now()}-${videoFile.name}`;
-      const filePath = path.join(process.cwd(), "public/uploads", filename);
-      await writeFile(filePath, buffer);
-      videoUrl = `/uploads/${filename}`;
+    // ادخل هنا إذا كان هناك فيديو جديد
+    if (video && typeof video === "object") {
+      const buffer = Buffer.from(await video.arrayBuffer());
+
+      // upload to cloudinary
+      const upload = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          {
+            folder: "reels",
+            resource_type: "video",
+          },
+          (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+          }
+        ).end(buffer);
+      });
+
+      videoUrl = upload.secure_url;
     }
 
     const updatedReel = await prisma.reel.update({
@@ -77,18 +99,21 @@ export async function PUT(req, context) {
   }
 }
 
-// DELETE reel
-export async function DELETE(req, context) {
+// ========================= DELETE REEL =========================
+export async function DELETE(req, { params }) {
   try {
-    const { id } = context.params;
-    const user = await getUserFromCookie(req);
+    const user = await getUserFromCookie(); // FIXED
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { id } = params;
 
     const reel = await prisma.reel.findUnique({ where: { id } });
     if (!reel) return NextResponse.json({ error: "Reel not found" }, { status: 404 });
-    if (reel.authorId !== user.id) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (reel.authorId !== user.id)
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     await prisma.reel.delete({ where: { id } });
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Delete reel error:", err);

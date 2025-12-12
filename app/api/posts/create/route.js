@@ -9,63 +9,48 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+async function uploadToCloudinary(file, type = "image") {
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      { folder: "posts", resource_type: type },
+      (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      }
+    ).end(buffer);
+  });
+}
+
 export async function POST(req) {
   try {
-    const user = await getUserFromCookie();
-    if (!user) {
+    const user = await getUserFromCookie(req);
+    if (!user)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     const form = await req.formData();
+
     const title = form.get("title");
     const content = form.get("content");
     const image = form.get("image");
     const video = form.get("video");
 
-    if (!title || !content) {
-      return NextResponse.json(
-        { error: "Title and content are required" },
-        { status: 400 }
-      );
-    }
+    if (!title || !content)
+      return NextResponse.json({ error: "Title and content required" }, { status: 400 });
 
     let imageUrl = null;
     let videoUrl = null;
 
-    // Upload image
-    if (image && typeof image === "object") {
-      const bytes = await image.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
-      const uploadResult = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-          { folder: "posts", resource_type: "image" },
-          (err, result) => {
-            if (err) reject(err);
-            else resolve(result);
-          }
-        ).end(buffer);
-      });
-
-      imageUrl = uploadResult.secure_url;
+    if (image instanceof File) {
+      const upload = await uploadToCloudinary(image, "image");
+      imageUrl = upload.secure_url;
     }
 
-    // Upload video
-    if (video && typeof video === "object") {
-      const bytes = await video.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
-      const uploadResult = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-          { folder: "posts", resource_type: "video" },
-          (err, result) => {
-            if (err) reject(err);
-            else resolve(result);
-          }
-        ).end(buffer);
-      });
-
-      videoUrl = uploadResult.secure_url;
+    if (video instanceof File) {
+      const upload = await uploadToCloudinary(video, "video");
+      videoUrl = upload.secure_url;
     }
 
     const post = await prisma.post.create({
@@ -81,9 +66,6 @@ export async function POST(req) {
     return NextResponse.json({ post });
   } catch (err) {
     console.error("Create post error:", err);
-    return NextResponse.json(
-      { error: "Failed to create post" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create post" }, { status: 500 });
   }
 }

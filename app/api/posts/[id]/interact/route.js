@@ -2,10 +2,9 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getUserFromCookie } from "@/lib/auth";
 
-// GET likes & comments for a post (including nested comments)
-export async function GET(req, context) {
+// GET likes & comments
+export async function GET(req, { params }) {
   try {
-    const params = await context.params; // unwrap
     const { id } = params;
 
     const post = await prisma.post.findUnique({
@@ -13,49 +12,43 @@ export async function GET(req, context) {
       include: {
         likes: { select: { userId: true } },
         comments: {
-          where: { parentId: null }, // top-level comments only
+          where: { parentId: null },
           include: {
             author: { select: { id: true, name: true } },
+            likes: { select: { userId: true } },
             replies: {
               include: {
                 author: { select: { id: true, name: true } },
                 likes: { select: { userId: true } },
-                replies: true, // recursively include replies (optional: limit depth if needed)
+                replies: true,
               },
             },
-            likes: { select: { userId: true } },
           },
           orderBy: { createdAt: "desc" },
         },
       },
     });
 
-    if (!post)
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    if (!post) return NextResponse.json({ error: "Post not found" }, { status: 404 });
 
     return NextResponse.json({ likes: post.likes, comments: post.comments });
   } catch (err) {
-    console.error("Get interactions error:", err);
-    return NextResponse.json(
-      { error: "Failed to fetch interactions" },
-      { status: 500 }
-    );
+    console.error("Get post interactions error:", err);
+    return NextResponse.json({ error: "Failed to fetch interactions" }, { status: 500 });
   }
 }
 
-// POST like/unlike or comment/reply
-export async function POST(req, context) {
+// POST like/comment
+export async function POST(req, { params }) {
   try {
-    const params = await context.params; // unwrap
     const { id } = params;
-
     const user = await getUserFromCookie(req);
-    if (!user)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const data = await req.json();
 
-    // Like/unlike post
+    // LIKE / UNLIKE
     if (data.type === "like") {
       const existing = await prisma.like.findUnique({
         where: { postId_userId: { postId: id, userId: user.id } },
@@ -66,36 +59,34 @@ export async function POST(req, context) {
           where: { postId_userId: { postId: id, userId: user.id } },
         });
         return NextResponse.json({ liked: false });
-      } else {
-        await prisma.like.create({ data: { postId: id, userId: user.id } });
-        return NextResponse.json({ liked: true });
       }
+
+      await prisma.like.create({
+        data: { postId: id, userId: user.id },
+      });
+
+      return NextResponse.json({ liked: true });
     }
 
-    // Comment or reply
-    else if (data.type === "comment") {
-      if (!data.content || data.content.trim() === "")
+    // COMMENT / REPLY
+    if (data.type === "comment") {
+      if (!data.content?.trim())
         return NextResponse.json({ error: "Empty comment" }, { status: 400 });
 
-      const commentData = {
-        postId: id,
-        authorId: user.id,
-        content: data.content,
-        emoji: data.emoji || null,
-      };
-
-      // If parentId exists, this is a reply
-      if (data.parentId) commentData.parentId = data.parentId;
-
-      const comment = await prisma.comment.create({ data: commentData });
+      const comment = await prisma.comment.create({
+        data: {
+          postId: id,
+          authorId: user.id,
+          content: data.content,
+          emoji: data.emoji || null,
+          parentId: data.parentId || null,
+        },
+      });
 
       return NextResponse.json({ comment });
     }
 
-    // Invalid type
-    else {
-      return NextResponse.json({ error: "Invalid type" }, { status: 400 });
-    }
+    return NextResponse.json({ error: "Invalid type" }, { status: 400 });
   } catch (err) {
     console.error("Post interaction error:", err);
     return NextResponse.json({ error: "Failed to interact" }, { status: 500 });

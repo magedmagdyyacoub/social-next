@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getUserFromCookie } from "@/lib/auth";
 
-// GET reel interactions
+// GET reel interactions (likes + comments)
 export async function GET(req, context) {
   try {
-    const { id } = await context.params; // 🔹 await params
+    const { id } = context.params; // ✅ بدون await
 
     const reel = await prisma.reel.findUnique({
       where: { id },
@@ -29,24 +29,34 @@ export async function GET(req, context) {
       },
     });
 
-    if (!reel) return NextResponse.json({ error: "Reel not found" }, { status: 404 });
-    return NextResponse.json({ likes: reel.likes, comments: reel.comments });
+    if (!reel)
+      return NextResponse.json({ error: "Reel not found" }, { status: 404 });
+
+    return NextResponse.json({
+      likes: reel.likes,
+      comments: reel.comments,
+    });
   } catch (err) {
     console.error("Get reel interactions error:", err);
-    return NextResponse.json({ error: "Failed to fetch interactions" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch interactions" },
+      { status: 500 }
+    );
   }
 }
 
-// POST like/unlike or comment
+// POST like/unlike OR comment/reply
 export async function POST(req, context) {
   try {
-    const { id } = await context.params; // 🔹 await params
+    const { id } = context.params; // ✅ بدون await
+
     const user = await getUserFromCookie(req);
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const data = await req.json();
 
-    // Like/unlike
+    // ❤️ Like / Unlike
     if (data.type === "like") {
       const existing = await prisma.reelLike.findUnique({
         where: { reelId_userId: { reelId: id, userId: user.id } },
@@ -57,14 +67,17 @@ export async function POST(req, context) {
           where: { reelId_userId: { reelId: id, userId: user.id } },
         });
         return NextResponse.json({ liked: false });
-      } else {
-        await prisma.reelLike.create({ data: { reelId: id, userId: user.id } });
-        return NextResponse.json({ liked: true });
       }
+
+      await prisma.reelLike.create({
+        data: { reelId: id, userId: user.id },
+      });
+
+      return NextResponse.json({ liked: true });
     }
 
-    // Comment or reply
-    else if (data.type === "comment") {
+    // 💬 Add Comment or Reply
+    if (data.type === "comment") {
       if (!data.content || data.content.trim() === "")
         return NextResponse.json({ error: "Empty comment" }, { status: 400 });
 
@@ -73,19 +86,25 @@ export async function POST(req, context) {
         authorId: user.id,
         content: data.content,
         emoji: data.emoji || null,
+        parentId: data.parentId || null,
       };
 
-      if (data.parentId) commentData.parentId = data.parentId;
+      const comment = await prisma.reelComment.create({
+        data: commentData,
+      });
 
-      const comment = await prisma.reelComment.create({ data: commentData });
       return NextResponse.json({ comment });
     }
 
-    else {
-      return NextResponse.json({ error: "Invalid type" }, { status: 400 });
-    }
+    return NextResponse.json(
+      { error: "Invalid interaction type" },
+      { status: 400 }
+    );
   } catch (err) {
     console.error("Reel interaction error:", err);
-    return NextResponse.json({ error: "Failed to interact" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to interact" },
+      { status: 500 }
+    );
   }
 }

@@ -9,28 +9,32 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function POST(req: Request) {
+export async function POST(req) {
   try {
-    const user = await getUserFromCookie(req);
+    const user = await getUserFromCookie(); // ← تم إصلاح المشكلة هنا
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const formData = await req.formData();
-    const caption = formData.get("caption") as string;
-    const video = formData.get("video") as File;
+    const caption = formData.get("caption");
+    const video = formData.get("video");
 
-    if (!video) {
+    if (!video || typeof video !== "object") {
       return NextResponse.json({ error: "Video required" }, { status: 400 });
     }
 
-    // رفع الفيديو على Cloudinary
+    // تحويل الفيديو إلى Buffer
     const arrayBuffer = await video.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const uploadResult = await new Promise<any>((resolve, reject) => {
+    // رفع الفيديو على Cloudinary
+    const uploadResult = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
-        { folder: "reels", resource_type: "video" }, // مهم: resource_type = video
+        {
+          folder: "reels",
+          resource_type: "video", // ضروري جداً
+        },
         (err, result) => {
           if (err) reject(err);
           else resolve(result);
@@ -40,10 +44,10 @@ export async function POST(req: Request) {
 
     const videoUrl = uploadResult.secure_url;
 
-    // حفظ البيانات في قاعدة البيانات
+    // حفظ الريل في قاعدة البيانات
     const reel = await prisma.reel.create({
       data: {
-        caption,
+        caption: caption || "",
         video: videoUrl,
         authorId: user.id,
       },
@@ -52,6 +56,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ reel });
   } catch (err) {
     console.error("Create reel error:", err);
-    return NextResponse.json({ error: "Failed to create reel" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create reel" },
+      { status: 500 }
+    );
   }
 }
