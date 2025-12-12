@@ -1,14 +1,5 @@
 {
-  "/api/auth/login/route": "app/api/auth/login/route.js",
-  "/api/auth/logout/route": "app/api/auth/logout/route.js",
   "/api/auth/me/route": "app/api/auth/me/route.js",
-  "/api/friends/list/route": "app/api/friends/list/route.js",
-  "/api/friends/requests/route": "app/api/friends/requests/route.js",
-  "/api/friends/suggestions/route": "app/api/friends/suggestions/route.js",
   "/api/posts/random/route": "app/api/posts/random/route.js",
-  "/api/reels/[id]/interact/route": "app/api/reels/[id]/interact/route.js",
-  "/api/reels/random/route": "app/api/reels/random/route.js",
-  "/login/page": "app/login/page.js",
-  "/page": "app/page.js",
-  "/profile/page": "app/profile/page.js"
+  "/page": "app/page.js"
 }

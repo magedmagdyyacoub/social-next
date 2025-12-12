@@ -1,0 +1,275 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/api/chat/[friendId]",
+      "regex": "^/api/chat/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPfriendId": "nxtPfriendId"
+      },
+      "namedRegex": "^/api/chat/(?<nxtPfriendId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/comments/[id]/like",
+      "regex": "^/api/comments/([^/]+?)/like(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/comments/(?<nxtPid>[^/]+?)/like(?:/)?$"
+    },
+    {
+      "page": "/api/messages/[chatId]",
+      "regex": "^/api/messages/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPchatId": "nxtPchatId"
+      },
+      "namedRegex": "^/api/messages/(?<nxtPchatId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/posts/[id]",
+      "regex": "^/api/posts/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/posts/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/posts/[id]/interact",
+      "regex": "^/api/posts/([^/]+?)/interact(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/posts/(?<nxtPid>[^/]+?)/interact(?:/)?$"
+    },
+    {
+      "page": "/api/reels/[id]",
+      "regex": "^/api/reels/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/reels/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/reels/[id]/interact",
+      "regex": "^/api/reels/([^/]+?)/interact(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/reels/(?<nxtPid>[^/]+?)/interact(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin/dashboard",
+      "regex": "^/admin/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/dashboard(?:/)?$"
+    },
+    {
+      "page": "/api/auth/login",
+      "regex": "^/api/auth/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/login(?:/)?$"
+    },
+    {
+      "page": "/api/auth/logout",
+      "regex": "^/api/auth/logout(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/logout(?:/)?$"
+    },
+    {
+      "page": "/api/auth/me",
+      "regex": "^/api/auth/me(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/me(?:/)?$"
+    },
+    {
+      "page": "/api/auth/register",
+      "regex": "^/api/auth/register(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/register(?:/)?$"
+    },
+    {
+      "page": "/api/friends/accept",
+      "regex": "^/api/friends/accept(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/friends/accept(?:/)?$"
+    },
+    {
+      "page": "/api/friends/add",
+      "regex": "^/api/friends/add(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/friends/add(?:/)?$"
+    },
+    {
+      "page": "/api/friends/list",
+      "regex": "^/api/friends/list(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/friends/list(?:/)?$"
+    },
+    {
+      "page": "/api/friends/reject",
+      "regex": "^/api/friends/reject(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/friends/reject(?:/)?$"
+    },
+    {
+      "page": "/api/friends/requests",
+      "regex": "^/api/friends/requests(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/friends/requests(?:/)?$"
+    },
+    {
+      "page": "/api/friends/suggestions",
+      "regex": "^/api/friends/suggestions(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/friends/suggestions(?:/)?$"
+    },
+    {
+      "page": "/api/messages",
+      "regex": "^/api/messages(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/messages(?:/)?$"
+    },
+    {
+      "page": "/api/messages/get-chat",
+      "regex": "^/api/messages/get\\-chat(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/messages/get\\-chat(?:/)?$"
+    },
+    {
+      "page": "/api/posts/create",
+      "regex": "^/api/posts/create(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/posts/create(?:/)?$"
+    },
+    {
+      "page": "/api/posts/mine",
+      "regex": "^/api/posts/mine(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/posts/mine(?:/)?$"
+    },
+    {
+      "page": "/api/posts/random",
+      "regex": "^/api/posts/random(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/posts/random(?:/)?$"
+    },
+    {
+      "page": "/api/reels/create",
+      "regex": "^/api/reels/create(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/reels/create(?:/)?$"
+    },
+    {
+      "page": "/api/reels/mine",
+      "regex": "^/api/reels/mine(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/reels/mine(?:/)?$"
+    },
+    {
+      "page": "/api/reels/random",
+      "regex": "^/api/reels/random(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/reels/random(?:/)?$"
+    },
+    {
+      "page": "/api/reels/upload",
+      "regex": "^/api/reels/upload(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/reels/upload(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/posts",
+      "regex": "^/posts(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/posts(?:/)?$"
+    },
+    {
+      "page": "/profile",
+      "regex": "^/profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profile(?:/)?$"
+    },
+    {
+      "page": "/reels/mine",
+      "regex": "^/reels/mine(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/reels/mine(?:/)?$"
+    },
+    {
+      "page": "/reels/upload",
+      "regex": "^/reels/upload(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/reels/upload(?:/)?$"
+    },
+    {
+      "page": "/register",
+      "regex": "^/register(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/register(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

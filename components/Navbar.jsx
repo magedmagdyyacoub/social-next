@@ -29,6 +29,7 @@ export default function Navbar() {
             <Link href="/posts">My Posts</Link>
             <Link href="/profile">Profile</Link>
             <Link href="/reels/mine">My Reels</Link> {/* 👈 NEW LINK */}
+            <Link href="/portfolio">Portfolio</Link> {/* 👈 NEW LINK */}
             {user.role === "ADMIN" && <Link href="/dashboard">Admin</Link>}
             <button onClick={logout}>Logout</button>
           </>
@@ -36,6 +37,7 @@ export default function Navbar() {
           <>
             <Link href="/login">Login</Link>
             <Link href="/register">Register</Link>
+            <Link href="/portfolio">Portfolio</Link> {/* 👈 NEW LINK */}
           </>
         )}
 

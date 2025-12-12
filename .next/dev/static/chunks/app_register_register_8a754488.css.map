@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Barakat/Desktop/social-next/app/register/register.css"],"sourcesContent":[".register-container {\r\n  width: 350px;\r\n  margin: 50px auto;\r\n  background: var(--card-bg);\r\n  padding: 25px;\r\n  border-radius: 8px;\r\n  box-shadow: 0 0 10px rgba(0,0,0,0.2);\r\n}\r\n\r\n.register-container h2 {\r\n  text-align: center;\r\n  margin-bottom: 20px;\r\n  color: var(--text);\r\n}\r\n\r\n.register-input {\r\n  width: 100%;\r\n  padding: 10px;\r\n  margin-bottom: 12px;\r\n  border-radius: 6px;\r\n  border: 1px solid #444;\r\n  background: var(--bg);\r\n  color: var(--text);\r\n}\r\n\r\n.register-button {\r\n  width: 100%;\r\n  padding: 10px;\r\n  background: #444;\r\n  color: white;\r\n  border: none;\r\n  cursor: pointer;\r\n  border-radius: 6px;\r\n}\r\n\r\n.register-button:hover {\r\n  background: #666;\r\n}\r\n"],"names":[],"mappings":"AAAA;;;;;;;;;AASA;;;;;;AAMA;;;;;;;;;;AAUA;;;;;;;;;;AAUA"}}]
-}

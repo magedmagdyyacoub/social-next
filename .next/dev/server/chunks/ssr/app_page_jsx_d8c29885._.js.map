@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Barakat/Desktop/social-next/app/page.jsx"],"sourcesContent":["\"use client\"; // لازم لو هتستخدم state أو context\r\n\r\nexport default function HomePage() {\r\n  return (\r\n    <main style={{ padding: \"20px\" }}>\r\n      <h1>Welcome to Social App</h1>\r\n      <p>This is the home page.</p>\r\n    </main>\r\n  );\r\n}\r\n"],"names":[],"mappings":";;;;;AAAA,cAAc,mCAAmC;;AAElC,SAAS;IACtB,qBACE,8OAAC;QAAK,OAAO;YAAE,SAAS;QAAO;;0BAC7B,8OAAC;0BAAG;;;;;;0BACJ,8OAAC;0BAAE;;;;;;;;;;;;AAGT"}}]
-}

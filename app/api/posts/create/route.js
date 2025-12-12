@@ -1,18 +1,20 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../../lib/prisma";
-import { writeFile } from "fs/promises";
 import { getUserFromCookie } from "@/lib/auth";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(req) {
   try {
-    // نفس نظام posts/create EXACTLY
     const user = await getUserFromCookie();
 
     if (!user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const form = await req.formData();
@@ -22,16 +24,22 @@ export async function POST(req) {
 
     let imageUrl = null;
 
-    // حفظ الصورة
+    // رفع الصورة على Cloudinary
     if (image && typeof image === "object") {
       const bytes = await image.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      const fileName = `profile_${Date.now()}_${image.name}`;
-      await writeFile(`public/uploads/${fileName}`, buffer);
-      imageUrl = `/uploads/${fileName}`;
+
+      const uploadResult = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream({ folder: "profiles" }, (err, result) => {
+          if (err) reject(err);
+          else resolve(result);
+        }).end(buffer);
+      });
+
+      imageUrl = uploadResult.secure_url;
     }
 
-    // تحديث البيانات
+    // تحديث بيانات المستخدم
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
@@ -42,12 +50,8 @@ export async function POST(req) {
     });
 
     return NextResponse.json({ user: updatedUser });
-
   } catch (err) {
     console.error("UPDATE ERROR:", err);
-    return NextResponse.json(
-      { error: "Update failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Update failed" }, { status: 500 });
   }
 }

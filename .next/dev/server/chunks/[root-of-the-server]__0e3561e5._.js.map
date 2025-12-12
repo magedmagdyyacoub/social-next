@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 40, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Barakat/Desktop/social-next/app/api/auth/logout/route.js"],"sourcesContent":["import { serialize } from \"cookie\";\r\n\r\nexport async function POST() {\r\n  const cookie = serialize(\"token\", \"\", { path: \"/\", maxAge: 0 });\r\n  return new Response(\"Logged out\", { status: 200, headers: { \"Set-Cookie\": cookie } });\r\n}\r\n"],"names":[],"mappings":";;;;AAAA;;AAEO,eAAe;IACpB,MAAM,SAAS,IAAA,sJAAS,EAAC,SAAS,IAAI;QAAE,MAAM;QAAK,QAAQ;IAAE;IAC7D,OAAO,IAAI,SAAS,cAAc;QAAE,QAAQ;QAAK,SAAS;YAAE,cAAc;QAAO;IAAE;AACrF"}}]
-}

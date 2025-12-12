@@ -24,6 +24,8 @@ model User {
   friendedBy       Friend[]        @relation("FriendUsers")
   reels            Reel[]
   reelLikes        ReelLike[]
+   bio       String?   
+  image     String?
 
   sentMessages     Message[]  @relation("sentMessages")
   receivedMessages Message[]  @relation("receivedMessages")

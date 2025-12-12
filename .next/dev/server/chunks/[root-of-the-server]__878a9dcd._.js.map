@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 46, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Barakat/Desktop/social-next/lib/prisma.js"],"sourcesContent":["import { PrismaClient } from \"@prisma/client\";\r\n\r\nconst globalForPrisma = globalThis;\r\n\r\nexport const prisma =\r\n  globalForPrisma.prisma ||\r\n  new PrismaClient();\r\n\r\nif (process.env.NODE_ENV !== \"production\") globalForPrisma.prisma = prisma;\r\n\r\nexport default prisma;\r\n"],"names":[],"mappings":";;;;;;AAAA;;AAEA,MAAM,kBAAkB;AAEjB,MAAM,SACX,gBAAgB,MAAM,IACtB,IAAI,6IAAY;AAElB,wCAA2C,gBAAgB,MAAM,GAAG;uCAErD"}},
-    {"offset": {"line": 68, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Barakat/Desktop/social-next/app/api/auth/register/route.js"],"sourcesContent":["import prisma from \"@/lib/prisma\";\r\nimport bcrypt from \"bcryptjs\";\r\n\r\nexport async function POST(req) {\r\n  const { name, email, password } = await req.json();\r\n  const hashed = await bcrypt.hash(password, 10);\r\n\r\n  const user = await prisma.user.create({\r\n    data: { name, email, password: hashed },\r\n  });\r\n\r\n  return new Response(JSON.stringify({ user }), { status: 200 });\r\n}\r\n"],"names":[],"mappings":";;;;AAAA;AACA;;;AAEO,eAAe,KAAK,GAAG;IAC5B,MAAM,EAAE,IAAI,EAAE,KAAK,EAAE,QAAQ,EAAE,GAAG,MAAM,IAAI,IAAI;IAChD,MAAM,SAAS,MAAM,8IAAM,CAAC,IAAI,CAAC,UAAU;IAE3C,MAAM,OAAO,MAAM,0HAAM,CAAC,IAAI,CAAC,MAAM,CAAC;QACpC,MAAM;YAAE;YAAM;YAAO,UAAU;QAAO;IACxC;IAEA,OAAO,IAAI,SAAS,KAAK,SAAS,CAAC;QAAE;IAAK,IAAI;QAAE,QAAQ;IAAI;AAC9D"}}]
-}
